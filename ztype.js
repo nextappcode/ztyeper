@@ -3446,7 +3446,7 @@ ig.module("impact.game")
 // lib/game/menus/base.js
 ig.baked = true;
 ig.module("game.menus.base")
-    .requires("impact.font")
+    .requires("impact.font", "impact.text-font")
     .defines(function () {
         MenuItem = ig.Class.extend({
             getText: function () {
@@ -3462,7 +3462,7 @@ ig.module("game.menus.base")
         });
         MenuItemBack = MenuItem.extend({
             getText: function () {
-                return "back to menu";
+                return ig.TEXT.current.MENU_ITEM_BACK_TO_MENU;
             },
             ok: function () {
                 ig.game.setTitle();
@@ -3471,7 +3471,7 @@ ig.module("game.menus.base")
         Menu = ig.Class.extend({
             clearColor: null,
             name: null,
-            font: new ig.Font("media/fonts/avenir-36-white.png"),
+            font: new ig.Font("media/fonts/avenir-18-white.png"),
             fontSelected: new ig.Font("media/fonts/avenir-36-orange.png"),
             current: 0,
             itemClasses: [],
@@ -3588,7 +3588,7 @@ ig.module("game.menus.about")
     .defines(function () {
         MenuItemRestoreIAP = MenuItem.extend({
             getText: function () {
-                return "Restore In-App Purchases";
+                return ig.TEXT.current.MENU_ITEM_RESTORE_IAP;
             },
             ok: function () {
                 ig.game.restoreIAP();
@@ -6274,6 +6274,7 @@ ig.module("game.main")
     .requires(
         "impact.game",
         "impact.font",
+        "impact.text-font",
         "game.menus.about",
         "game.menus.game-over",
         "game.menus.pause",
@@ -6299,8 +6300,8 @@ ig.module("game.main")
             return Number.zeroes.substr(0, d - s.length) + s;
         };
         ZType = ig.Game.extend({
-            font: new ig.Font("media/fonts/avenir-18-white.png"),
-            fontTitle: new ig.Font("media/fonts/avenir-36-blue.png"),
+            font: new ig.TextFont(18, '#ffffff'),
+            fontTitle: new ig.TextFont(36, '#4d82fe'),
             separatorBar: new ig.Image("media/ui/bar-blue.png"),
             idleTimer: null,
             spawnTimer: null,
@@ -6338,8 +6339,6 @@ ig.module("game.main")
                 if (ig.doc && ig.doc.fragments.length < 2) {
                     ig.doc = null;
                 }
-                this.fontTitle.letterSpacing = -2;
-                this.font.letterSpacing = -1;
                 var bgmap = new ig.BackgroundMap(620, [[1]], this.grid);
                 bgmap.repeat = true;
                 this.backgroundMaps.push(bgmap);
@@ -6770,9 +6769,9 @@ ig.module("game.main")
                 this.mode = ZType.MODE.GAME;
                 this.nextWave();
                 ig.music.next();
-                this.spawnSound.play();
-                this.emps = 3;
-            },
+                        this.spawnSound.play();
+                        this.emps = 3; // Press ENTER for EMP
+                    },
             setGameOver: function () {
                 if (this.score > this.personalBest) {
                     this.isPersonalBest = true;
@@ -7000,13 +6999,22 @@ ig.module("game.main")
                         (Math.sin(this.idleTimer.delta() * 4) * 0.25 + 0.75) *
                         aa;
                     this.font.draw(
-                        "Type the words to shoot!\nENTER for EMP",
+                        "Type the words to shoot!",
                         ig.system.width / 2,
                         ig.system.height - 180,
                         ig.Font.ALIGN.CENTER,
                     );
                     ig.system.context.globalAlpha = 1;
                 }
+                ig.system.context.globalAlpha =
+                    (Math.sin(this.idleTimer.delta() * 4) * 0.25 + 0.4) * aa;
+                this.font.draw(
+                    "Press ENTER for EMP",
+                    ig.system.width -140,
+                    ig.system.height - 41,
+                    ig.Font.ALIGN.CENTER,
+                );
+                ig.system.context.globalAlpha = 1;
                 this.keyboard.draw();
             },
             purchaseRemoveAds: function () {
@@ -7065,7 +7073,7 @@ ig.module("game.main")
                 spawn: [],
                 spawnWait: 1,
                 healthBoost: 0,
-                speedIncrease: 1.01,
+                speedIncrease: 1.0,
                 types: [
                     {
                         type: EntityEnemyOppressor,
@@ -7090,7 +7098,7 @@ ig.module("game.main")
                 spawn: [],
                 spawnWait: 0.7,
                 healthBoost: 0,
-                speedIncrease: 1.05,
+                speedIncrease: 1.0,
                 types: [
                     {
                         type: EntityEnemyOppressor,
